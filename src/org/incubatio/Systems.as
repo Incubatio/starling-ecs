@@ -32,8 +32,9 @@ package org.incubatio {
   }
 }
 
-import Components;
-import Entity;
+import org.incubatio.Components;
+import org.incubatio.Entity;
+import org.incubatio.Systems;
 import flash.geom.Rectangle;
 
 
@@ -54,7 +55,18 @@ class Rendering extends System {
   public function update(entity:Entity, ms:int) : void {
     var component:* = entity.getComponent("Visible");
     if(component) {
-      if(component.animation) { component.image = component.animation.update(ms); }
+      // Three choice to manage animation:
+      // 1. Animation automatically managed by a MovieClip object added to Starling.juggler
+      // 2. using A movieClip and manually playing animation object.advanceTime(time);
+      // 3. using gamecs spriteSheet object component.image = component.animation.update(ms); }
+      if(component.animation && component.animation.isRunning()) { 
+        trace(component.animation.getCurrentFrame());
+
+        var game:Game = Systems.getResource("game");
+        game.removeChild(component.image);
+        component.image = component.animation.update(4);
+        game.addChild(component.image);
+      }
       component.image.x = entity.x;
       component.image.y = entity.y;
     }
@@ -144,12 +156,9 @@ class Collision extends System {
           //var oldRect:Rectangle = component2.mask.clone();
           entity.pos = entity.oldPos.concat();
           var multiplier:Number = component.dirX != 0 && component.dirY != 0 ? 1 : 1.41;
-          trace(collisions);
-          trace(entity.pos);
           for(var i:uint = 0; i < 2; i++) {
             var move:int = component.dir[i] * component.speed[i] * multiplier;
             entity.pos[i] += move;
-            trace(entity.pos);
             
             collisions2 = this.spriteCollide(entity);
             if(collisions2.length > 0) {

@@ -30,6 +30,7 @@ package org.incubatio {
 
 import starling.textures.Texture;
 import starling.display.Image;
+import org.incubatio.Components;
 
 
 class Visible {
@@ -42,7 +43,11 @@ class Visible {
   public var shape:int = 0;
 
   public var image:Image;
+
   public var animation:Object;
+  public var frameSize:Array;
+  public var frameset:Object;
+  public var options:Object;
 }
 
 class Communicable {

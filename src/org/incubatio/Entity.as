@@ -1,6 +1,6 @@
 package org.incubatio {
-import Components;
-import EventObject;
+import org.incubatio.Components;
+import org.incubatio.EventObject;
 
   public class Entity extends EventObject {
     protected static var UID:int = 1;
