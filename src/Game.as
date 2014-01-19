@@ -3,14 +3,19 @@ package {
   import starling.events.Event;
   import starling.events.KeyboardEvent;
   import starling.events.TouchEvent;
+  import starling.events.Touch;
 
 	import starling.textures.Texture;
 	import org.incubatio.TextureAtlas;
 	import org.incubatio.SpriteSheet;
+	import org.incubatio.TileMap;
 	import org.incubatio.Animation;
 	import starling.display.Image;
 
+  import flash.system.Capabilities;
+
   import flash.geom.Matrix;
+  import flash.geom.Point;
 
   import flash.utils.ByteArray;
 
@@ -32,7 +37,8 @@ package {
     // TODO: move groups into director
 
     //public var inputEvents:Array = new Array();
-    protected var _states:Array = new Array();
+    protected var _keyboardStates:Array = new Array();
+    protected var _mouseStates:Array = new Array();
 
     public var mySystems:Array = new Array();
     public var groups:Object = {};
@@ -71,7 +77,7 @@ package {
             if(component.shape) {
               switch(component.shape) {
                 // TODO: add texture to texture atlas
-                case "rect": texture = ShapeUtil.squareTexture(component.size[0], component.size[1]); break;
+                case "rect": texture = ShapeUtil.rectTexture(component.size[0], component.size[1]); break;
                 case "circle": texture = ShapeUtil.circleTexture(component.radius); break;
                 default: trace("Unrecognized component type");
               }
@@ -138,7 +144,7 @@ package {
       // INIT systems
       Systems.setResource("game", this);
       Systems.setResource("entities", entities);
-      Systems.setResource("screenSize", config.screen.size);
+     Systems.setResource("screenSize", config.screen.size);
       for each(var k:String in config.systems) {
         var SystemClass:Class = Systems.get(k);
         //this.mySystems[k] = new SystemClass({ entities: entities });
@@ -161,13 +167,35 @@ package {
               if(component.hasCollidedX) component.dirX = -component.dirX;
               if(component.hasCollidedY) component.dirY = -component.dirY;
           });
-
         }
-
       }
 
       trace(config.screen.size);
-      this.myDirector = new Director({groups: groups, player: player});
+      var tileHorrizontalNum:uint = 12;
+      var tileVerticalNum:uint = 10;
+      var tileWidth:uint  = Math.floor(config.screen.size[0] / tileHorrizontalNum);
+      var tileHeight:uint = Math.floor(config.screen.size[1] / tileVerticalNum);
+
+      var map:TileMap = new TileMap({
+        width: tileHorrizontalNum,
+        height: tileVerticalNum,
+        tilewidth: tileWidth,
+        tileheight: tileHeight
+        });
+
+      var selectedTile:Image = new Image(ShapeUtil.rectTexture(tileWidth, tileHeight, 0x00FF00, 0.1, true));
+      this.addChild(selectedTile);
+
+      for(var i:uint = 0; i < tileVerticalNum; i++) {
+        for(var j:uint = 0; j < tileHorrizontalNum; j++) {
+          var buffImg:Image = new Image(ShapeUtil.rectTexture(tileWidth, tileHeight));
+          buffImg.x = j * tileWidth; 
+          buffImg.y = i * tileHeight;
+          this.addChild(buffImg);
+        }
+      }
+
+      this.myDirector = new Director({groups: groups, player: player, map:map, selectedTile:selectedTile});
       //this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 
       this.onAddedToStage(null);
@@ -186,15 +214,26 @@ package {
     public function onAddedToStage(e:Event):void {
       this.addEventListener(KeyboardEvent.KEY_DOWN, this.onKeyDown);
       this.addEventListener(KeyboardEvent.KEY_UP, this.onKeyUp);
+
+      //Test if device is computer, add mouse event or touch event depending the device involve
+      trace("resolution: " + Capabilities.screenResolutionY);
+      this.addEventListener(TouchEvent.TOUCH, this.onTouch);
     }
 
     public function onKeyUp(e:KeyboardEvent):void {
-      this._states[e.keyCode] = false;
+      this._keyboardStates[e.keyCode] = false;
     }
 
     public function onKeyDown(e:KeyboardEvent):void {
-      this._states[e.keyCode] = true;
+      this._keyboardStates[e.keyCode] = true;
     }
+
+    private function onTouch(event:TouchEvent):void {
+      var touch:Touch = event.getTouch(this);
+      if(touch) { this._mouseStates[touch.phase] = touch; }
+    }
+
+
 
     public function addInputEvent(e:Event):void { 
       //this.inputEvents.push(e); 
@@ -208,7 +247,7 @@ package {
 
       // 1. Handle input and A.I.
       //myDirector.handleInput(this.inputEvents);
-      myDirector.handleInput(this._states);
+      myDirector.handleInput(this._keyboardStates, this._mouseStates);
 
 
       // TODO: looks what more performant btw pop, while inputEvent.size or present solution)

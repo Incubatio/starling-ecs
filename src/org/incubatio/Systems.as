@@ -60,7 +60,6 @@ class Rendering extends System {
       // 2. using A movieClip and manually playing animation object.advanceTime(time);
       // 3. using gamecs spriteSheet object component.image = component.animation.update(ms); }
       if(component.animation && component.animation.isRunning()) { 
-        trace(component.animation.getCurrentFrame());
 
         var game:Game = Systems.getResource("game");
         game.removeChild(component.image);

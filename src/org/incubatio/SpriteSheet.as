@@ -6,6 +6,7 @@ package org.incubatio {
   public class SpriteSheet {
 
     protected var _images:Array;
+    protected var _firstgid:uint = 0;
     
     public function SpriteSheet() {
       this._images = new Array();
@@ -17,6 +18,7 @@ package org.incubatio {
     }
 
     // sheet is a Texture that contains multiple frame
+    // Note: You can use load() several times, new Textures will be stacked in the _image Array.
     public function load(sheet:Texture, frameW:Number, frameH:Number):void {
 
       var imgSize:Rectangle = new Rectangle(0, 0, frameW, frameH)
@@ -32,11 +34,15 @@ package org.incubatio {
 
           var frame:Rectangle = new Rectangle((x*frameW), (y*frameH), frameW, frameH);
           this._images.push(Texture.fromTexture(sheet, frame, imgSize));
-
-          //return Texture.fromTexture(mAtlasTexture, region, mTextureFrames[name]);
-          //surface.blit(sheet, imgSize, rect)
         }
       }
+    }
+
+    public function getFirstgid():uint {
+      return this._firstgid;
+    }
+    public function setFirstgid(gid:uint):void {
+      this._firstgid = gid;
     }
   }
 }

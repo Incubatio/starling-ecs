@@ -12,10 +12,9 @@
   sprites:
     Pad:
       Visible:
-#        size: [5, 40]
-#color: 0x000000
+#        size: [40, 40]
+#        color: "0x0000CC"
 #        shape: "rect"
-#Visible2:
         frameSize: [64, 64]
         frameset: { down: [56, 59],  left: [8, 11], right: [8, 11], up: [34, 39], pause: [64, 65] }
         image: "firefox"

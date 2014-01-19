@@ -44,7 +44,9 @@ package {
       this._config = JSON.parse(myLoader.data);
 
       var viewPort:Rectangle = new Rectangle(0, 0, this._config.screen.size[0], this._config.screen.size[1]);
+      Starling.multitouchEnabled = true;
       this._myStarling = new Starling(Game, stage);
+      this._myStarling.simulateMultitouch = true;
       this._myStarling.antiAliasing = 1;
       this._myStarling.start();
       this._myStarling.addEventListener("rootCreated", onRootCreated);

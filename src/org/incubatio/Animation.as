@@ -45,7 +45,6 @@ package org.incubatio {
     public function open(currentAnimation:String):void { this._currentAnimation = currentAnimation; } 
 
     public function start(animName:String):Animation {
-      trace("test ?");
       this.open(animName);
       this.reset(true);
       return this;
