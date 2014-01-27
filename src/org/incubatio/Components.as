@@ -52,17 +52,17 @@ class Visible {
 
 class Communicable {
   public var avatar:String = "question.png";
-  public var dialogs:Array = null;
+  public var dialogs:Vector.<String> = null;
 }
 
 class Mobile {
   public var speed:Array = null;
   public var dir:Array = null;
-  public var hasCollided:Array = null;
+  public var hasCollided:Vector.<Boolean> = null;
   public function Mobile(): void {
     this.speed = new Array(0, 0, 0);
     this.dir = new Array(0, 0, 0);
-    this.hasCollided = new Array(false, false, false);
+    this.hasCollided = new <Boolean>[false, false, false];
   }
   
   public function get dirX():int { return this.dir[0]; }

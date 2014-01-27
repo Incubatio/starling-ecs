@@ -49,7 +49,6 @@ package org.incubatio {
 
 
 
-
 import org.incubatio.Components;
 import org.incubatio.Entity;
 import org.incubatio.Systems;
@@ -115,12 +114,12 @@ class Collision implements ISystem {
   * @param {Array} entities
   * @return {Array}
   */ 
-  public var spriteCollide:Function = function():Array { return new Array() };
+  public var spriteCollide:Function = function():Vector.<Entity> { return new <Entity>[]; }
 
   // entity.components.Collidable ?
-  public function defaultSpriteCollide(entity:Entity):Array {
-    var collisions:Array = new Array();
-    var entities:Array = Systems.getResource("entities");
+  public function defaultSpriteCollide(entity:Entity):Vector.<Entity> {
+    var collisions:Vector.<Entity> = new <Entity>[];
+    var entities:Vector.<Entity> = Systems.getResource("entities");
     for each(var entity2:Entity in entities) {
       if(entity.id != entity2.id) {
         var bounds1:Rectangle = entity.getComponent("Collidable").mask;
@@ -144,10 +143,10 @@ class Collision implements ISystem {
       if(component.dirX != 0 || component.dirY != 0) {
         //component.hasCollided = component.hasCollided.map(function() { return true });
 
-        var collisions:Array = this.spriteCollide(entity);
+        var collisions:Vector.<Entity> = this.spriteCollide(entity);
         if(collisions.length > 0) {
-          var collisions2:Array = this.spriteCollide(entity);
-          component.hasCollided = new Array(false, false, false); 
+          var collisions2:Vector.<Entity> = this.spriteCollide(entity);
+          component.hasCollided = new <Boolean>[false, false, false]; 
 
           //var oldRect:Rectangle = component2.mask.clone();
           entity.pos = entity.oldPos.concat();

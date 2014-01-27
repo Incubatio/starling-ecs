@@ -17,7 +17,7 @@ package {
   public class BattleDirector extends ADirector {
 
     protected var _tileMap:TileMap;
-    protected var _tiles:Array = new Array();
+    protected var _tiles:Vector.<Image> = new <Image>[];
     protected var _selectedTile:Image;
 
     protected var _player:Entity;
@@ -76,7 +76,7 @@ package {
 
 
     override public function draw(game:Sprite):void {
-      for each(var group:Array in this.groups) {
+      for each(var group:Vector.<Entity> in this.groups) {
         for each(var entity:Entity in group) {
           var component2:Object = entity.getComponent("Visible");
           if(component2) { game.addChild(component2.image); }
@@ -86,16 +86,16 @@ package {
       for each(var tile:Image in this._tiles) { game.addChild(tile) };
 
       // Add world collision
-      Systems.get("Collision").spriteCollide = function(e:Entity):Array {
+      Systems.get("Collision").spriteCollide = function(e:Entity):Vector.<Entity> {
         var size:Array = Systems.getResource("screenSize");
         var component:Object = entity.getComponent("Visible");
-        return (entity.x > size[0] - component.image.width || entity.y > size[1] - component.image.height  || entity.x < 0 || entity.y < 0) ? new Array(new Entity(new Array(0,0), {})) : this.defaultSpriteCollide(e);
+        return (entity.x > size[0] - component.image.width || entity.y > size[1] - component.image.height  || entity.x < 0 || entity.y < 0) ? new <Entity>[new Entity(new Array(0,0), {})] : this.defaultSpriteCollide(e);
       }
     }
 
 
     override public function clear(game:Sprite):void {
-      for each(var group:Array in this.groups) {
+      for each(var group:Vector.<Entity> in this.groups) {
         for each(var entity:Entity in group) {
           var component2:Object = entity.getComponent("Visible");
           if(component2) game.removeChild(component2.image);
@@ -151,7 +151,7 @@ package {
             case TouchPhase.HOVER: 
               if(gid != oldgid) {
                 trace("cat: " + gid);
-                var pos:Array = this._tileMap.gid2pos(gid);
+                var pos:Vector.<uint> = this._tileMap.gid2pos(gid);
                 this._selectedTile.x = pos[0];
                 this._selectedTile.y = pos[1];
               }

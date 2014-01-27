@@ -66,13 +66,13 @@ package org.incubatio {
       
     /* @param {interger} gid
      * @return {array} */ 
-    public function gid2pos(gid:uint):Array {
+    public function gid2pos(gid:uint):Vector.<uint> {
       var getX:Function = function(i:uint, width:uint):uint { return (i % width == 0) ? width - 1 : (i % width) - 1; }
 
       var x:uint = (gid == 0) ? 0 : getX(gid + 1, this._width);
       var y:uint = Math.floor(gid / this._width);
 
-      return [x * this._tileWidth, y * this._tileHeight];
+      return new <uint>[x * this._tileWidth, y * this._tileHeight];
     }
 
     /*

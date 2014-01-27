@@ -133,9 +133,9 @@ package {
       myDirector.handleInput(this._keyboardStates, this._mouseStates);
 
       // 2. Update
-      for each(var group:Array in myDirector.groups) {
+      for each(var group:Vector.<Entity> in myDirector.groups) {
         for each(var entity:Entity in group) {
-          for each(var system:* in myDirector.systems) { Systems.get(system).update(entity, 10);}//stage.frameRate); }
+          for each(var system:String in myDirector.systems) { Systems.get(system).update(entity, 10);}//stage.frameRate); }
         }
       }
       // 4. Game Over condition

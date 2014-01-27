@@ -15,7 +15,7 @@ package org.incubatio {
 
     protected var _options:Object;
 
-    public var entities:Array = new Array();
+    public var entities:Vector.<Entity> = new <Entity>[];
     public var groups:Array = new Array();
     public var systems:Array = new Array();
 
@@ -31,9 +31,9 @@ package org.incubatio {
     }
 
 
-    public function initEntitiesFromConfig(config:Object):Array {
+    public function initEntitiesFromConfig(config:Object):Vector.<Entity> {
 
-      var entities:Array = new Array();
+      var entities:Vector.<Entity> = new <Entity>[];
       for each(var value:String in config.scene.actors) {
 
         var pos:Array = value.split(",");
