@@ -1,4 +1,7 @@
 package org.incubatio {
+
+
+
   public class Systems {
 
     public function Systems():void { throw new Error("Systems can't be instanciated"); }
@@ -8,29 +11,44 @@ package org.incubatio {
 
 
     public static function initSystemList():void {
-      Systems._data = {
-        Rendering: Rendering,
-        Rotation: Rotation,
-        Collision: Collision,
-        Movement: Movement,
-        Weapon: Weapon,
-        Jump: Jump
+      if(Systems._data == null) {
+        var list:Object = {
+          Rendering: Rendering,
+          //Rotation: Rotation,
+          Collision: Collision,
+          Movement: Movement
+          //Weapon: Weapon,
+        }
+        Systems._data = {};
+        for(var k:String in list) {
+          var SystemClass:Class = list[k];
+          Systems._data[k] = new SystemClass();
+        }
       }
     }
 
+
+    //public static function get(systemName:String):ISystem {
     public static function get(systemName:String):* {
-      return Systems._data[systemName] ? Systems._data[systemName] : false;
+      return Systems._data[systemName] ? Systems._data[systemName] : null;
     }
 
+
     public static function getResource(resourceName:String):* {
-      return Systems._resources[resourceName] ? Systems._resources[resourceName] : false;
+      return Systems._resources[resourceName] ? Systems._resources[resourceName] : null;
     }
+
 
     public static function setResource(resourceName:String, value:*):void {
       Systems._resources[resourceName] = value; 
     }
+
+
   }
 }
+
+
+
 
 import org.incubatio.Components;
 import org.incubatio.Entity;
@@ -38,21 +56,20 @@ import org.incubatio.Systems;
 import flash.geom.Rectangle;
 
 
-// TODO: switch class below to interface
-class System {
-  //protected var _options:Object = {};
-  //public function System(options:Object) : void {
-    //for k in options { this._data[k] = options[k] }
-  //  this._options = options;
-  //}
+
+// TODO: switch class below to an interface
+interface ISystem { 
+  function update(entity:Entity, ms:uint):void;
 }
 
-class Rendering extends System {
+
+
+class Rendering implements ISystem {
 
   protected var _offset:Array = new Array(0, 0);
   protected var _scaleRate:Number = 1;
 
-  public function update(entity:Entity, ms:int) : void {
+  public function update(entity:Entity, ms:uint) : void {
     var component:* = entity.getComponent("Visible");
     if(component) {
       // Three choice to manage animation:
@@ -74,43 +91,23 @@ class Rendering extends System {
   // Drawing is automatically managed by Action Script 3
 }
 
+
+
 // Transform Rotation
-class Rotation extends System {
-  /*
-  public function update(sprite):void {
-    if(!sprite.components.Visible.originalImage) {
-      sprite.components.Visible.originalImage = sprite.components.Visible.image;
-    }
-    if(sprite.components.Rotative) {
-      sprite.components.Rotative.rotation += sprite.components.Rotative.rotationSpeed;
-      if(sprite.components.Rotative.rotation >= 360) { sprite.components.Rotative.rotation -= 360; }
-      sprite.components.Visible.image = gamecs.Transform.rotate(sprite.components.Visible.originalImage, sprite.components.Rotative.rotation);
-      var size:Array = sprite.components.Visible.image.getSize();
-      sprite.rect.width = size[0];
-      sprite.rect.height = size[1];
-      sprite.dirty = true;
-    }
-  } */
+class Rotation implements ISystem {
+  public function update(entity:Entity, ms:uint):void {
+  }
 }
 
 
 
 // NOTE: possible perf optimisation: test collision and save position every second (instead of each frame)
 // if collision, replace sprite the position saved the last second
-class Collision extends System {
-  /*
-  _isColliding: (entity, entities) ->
-    res = false
-    for entity2 in entities
-      if entity.rect.collideRect(entity2.rect)
-        res = true
-        break
-    return res
-  */
+class Collision implements ISystem {
 
   public function Collision(): void {
     //super(options);
-    this.spriteCollide = this._spriteCollide;
+    this.spriteCollide = this.defaultSpriteCollide;
   }
   
   /* function used to detect the collision 
@@ -121,7 +118,7 @@ class Collision extends System {
   public var spriteCollide:Function = function():Array { return new Array() };
 
   // entity.components.Collidable ?
-  public function _spriteCollide(entity:Entity):Array {
+  public function defaultSpriteCollide(entity:Entity):Array {
     var collisions:Array = new Array();
     var entities:Array = Systems.getResource("entities");
     for each(var entity2:Entity in entities) {
@@ -174,7 +171,9 @@ class Collision extends System {
   } 
 }
 
-class Movement extends System {
+
+
+class Movement implements ISystem {
 
   public function update(entity:Entity, ms:uint):void {
     var component:* = entity.getComponent("Mobile");
@@ -197,95 +196,17 @@ class Movement extends System {
         entity.y += y;
         // TODO: check namespace entityGroup.entityCollide ?
 
-        /*
-        for each(var entity:Entity in collisions) {
-          if(!entity2.Traversable) entity2.dirty = true;
-          entity2.dirty = true;
-        }
-        */
       }
     }
   }
 }
 
 
-class Weapon extends System {
-  /*
-  public function update(entity, ms, director):void {
-    var component:* = entity.getComponent("Weaponized");
-    if(component && component.attacking) {
-      weapon = director.scene.entitys[entity.weapon];
-    
-      // test for current animation and if not exists, start it
-      if(!weapon.animation.currentAnimation) {
-        trace(entity.animation.currentAnimation)
-        animation = (!entity.animation.currentAnimation || entity.animation.currentAnimation == "pause") ? "down" : entity.animation.currentAnimation;
-        weapon.animation.start(animation);
-      }
-      //Rendering.clear(weapon, director.display)
-      weapon.oldImage = null;
 
-      // test for collision, apply hit
-      collisions = gamecs.sprite.spriteCollide(weapon, director.scene.spriteGroup);
-      for each(var entity2:Entity in collisions) {
-        if(entity2.Destructible) {
-          director.surface.clear(entity2.rect);
-          entity2.kill();
-        }
-      }
-      
-      // TODO: push ennemy on hit
-      // TODO: if ennemy is comming double hit, immobile normal hit, backing = 1/2 hit
-
-
-      // Check if animation is finished, if not update image
-      if(weapon.animation.finished) {
-        sprite.attacking = false;
-        weapon.animation.currentAnimation = null;
-        weapon.dirty = false;
-        weapon.rect.moveIp([- (sprite.rect.left + sprite.rect.width*2), - (sprite.rect.top + sprite.rect.height*2)]);
-      } else {
-        weapon.dirty = true;
-        weapon.rect.moveIp(sprite.rect.left - weapon.rect.left, sprite.rect.top - weapon.rect.top);
-        weapon.image = weapon.animation.update(60);
-      }
-    }
+class Weapon implements ISystem {
+  public function update(entity:Entity, ms:uint):void {
   }
-  */
 }
 
-
-// TOTHINK: Wouldn't it be enough to set a default MoveY to 1 ?
-// TOTHINK: Not really a gravity system, maybe implement one with box2d
-class Jump extends System {
-  /*
-
-  //TODO: jumping speed should be in component ?
-  protected var _force:int = 3;
-  protected var _gravity:int = 2;
-
-  public function update (entity, ms): void {
-    var component:* = entity.getComponent("Mobile");
-    var component2:* = entity.getComponent("Jumpable");
-    if(component && component2) {
-      // TODO: replace jumping by the startedAt
-      if(component2.startedAt) {
-        component.moveY = -1;
-        //trace, this._gravity * (new Date() - component2.startedAt) / 100
-        //trace, this._force * component.speedX
-        var speed:Number = (this._force * component.speedX) -  (this._gravity * (new Date() - component2.startedAt) / 100 );
-        //trace 3, Math.round(speed);
-        component.speedY = Math.round(speed);
-        if(speed < 1) component2.startedAt = false;
-      } else {
-        component.moveY = 1;
-        component.speedY = 4;
-        // Lol thx to the folowing, the hero can hang to the roof ^^ @IKeepThisForNow
-        if(entity.rect.top == entity.oldRect.top) component2.canJump = true;
-      }
-    }
-  }
-  */
-}
 
 Systems.initSystemList();

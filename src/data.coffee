@@ -29,13 +29,13 @@
 #color: 0x000000
 #shape: "circle"
         image: "tennis_ball"
-      Visble2:
-        frameSize: [32, 32]
-        frameset:
-          wave: [0, 3]
-          pause: [0]
-        image: "frameset/octocat.png"
-        options: { start: "wave" }
+#      Visble2:
+#        frameSize: [32, 32]
+#        frameset:
+#          wave: [0, 3]
+#          pause: [0]
+#        image: "frameset/octocat.png"
+#        options: { start: "wave" }
       Mobile:
         speed: [1, 1, 0]
         dir: [1, 1, 0]
@@ -43,9 +43,9 @@
         type: "image"
   scene:
     actors: [
-      ["Pad", [100, 400]]
-      ["Pad", [900, 400]]
-      ["Ball", [400, 400]]
+      ["Player", "Pad", [100, 400]]
+      ["Com", "Pad", [900, 400]]
+      ["Ball", "Ball", [400, 400]]
     ]
   decors: [
     ["text", "Hello World", [200, 250]]

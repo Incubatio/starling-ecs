@@ -12,7 +12,6 @@ package {
   import flash.geom.Rectangle;
 
   [SWF(width="1024", height="800", frameRate="60", backgroundColor="#999999")]
-  //[SWF(frameRate="60", backgroundColor="#999999")]
   public class Main extends Sprite {
 
     protected var _stats:Stats;
